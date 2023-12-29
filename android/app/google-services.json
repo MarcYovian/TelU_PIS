@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "680719267065",
+    "firebase_url": "https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "parkingiot-6568d",
+    "storage_bucket": "parkingiot-6568d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680719267065:android:37b8b89519fe3aabfdde28",
+        "android_client_info": {
+          "package_name": "com.example.parking_v3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGUjuZt9rSMoIGzHwBs0gvppSklMeq5IE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
