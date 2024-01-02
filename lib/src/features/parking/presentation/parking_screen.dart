@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +31,46 @@ class _ParkingScreenState extends State<ParkingScreen> {
         automaticallyImplyLeading: false,
         bottomOpacity: 1.0,
         foregroundColor: Colors.white10,
+        leading: _auth.currentUser != null
+            ? Padding(
+                padding: const EdgeInsets.all(10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, myProfileScreen);
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(60),
+                    child: StreamBuilder(
+                      stream: _parkingRepository.getUserData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text("error : ${snapshot.error}"),
+                          );
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        Profile profile = Profile.fromMap(
+                          snapshot.data!.data() as Map<String, dynamic>,
+                        );
+                        return Image.network(
+                          profile.image,
+                          width: 30,
+                          height: 30,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              )
+            : Container(),
         title: const Center(
           child: Text(
             "PARKING ZONE",
@@ -53,48 +92,10 @@ class _ParkingScreenState extends State<ParkingScreen> {
               );
             },
             icon: const Icon(
-              Icons.camera,
+              Icons.qr_code,
               color: Color(0xff0A1D81),
             ),
           ),
-          _auth.currentUser != null
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13),
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(60),
-                      child: StreamBuilder(
-                        stream: _parkingRepository.getUserData(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text("error : ${snapshot.error}"),
-                            );
-                          }
-
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          Profile profile = Profile.fromMap(
-                            snapshot.data!.data() as Map<String, dynamic>,
-                          );
-                          return Image.network(
-                            profile.image,
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                )
-              : Container(),
           IconButton(
             onPressed: () async {
               final authService =
@@ -128,10 +129,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
               }
 
               if (snapshot.hasData) {
-                var data = snapshot.data!.snapshot;
-                print(data.child('2').value);
-                // var block_1 = data.child('1').value as Map<String, dynamic>;
-                // var block_2 = data.child('2').value as Map<String, dynamic>;
+                // var data = snapshot.data!.snapshot;
                 return const Padding(
                   padding: const EdgeInsets.only(left: 30, right: 30, top: 40),
                   child: Align(
