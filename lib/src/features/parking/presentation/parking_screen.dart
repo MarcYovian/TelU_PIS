@@ -28,6 +28,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFEDF7F9),
       appBar: AppBar(
+        // backgroundColor: Colors.amber,
         backgroundColor: const Color(0xFFEDF7F9),
         automaticallyImplyLeading: false,
         bottomOpacity: 1.0,
@@ -202,7 +203,8 @@ class _ParkingScreenState extends State<ParkingScreen> {
                             children: [
                               Container(
                                 height: 75,
-                                width: 150,
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 53,
                                 decoration: const BoxDecoration(
                                   borderRadius: BorderRadius.only(
                                     topRight: Radius.circular(100),
@@ -243,7 +245,8 @@ class _ParkingScreenState extends State<ParkingScreen> {
                               ),
                               Container(
                                 height: 75,
-                                width: 150,
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 53,
                                 decoration: const BoxDecoration(
                                   borderRadius: BorderRadius.only(
                                     bottomRight: Radius.circular(100),
@@ -283,77 +286,82 @@ class _ParkingScreenState extends State<ParkingScreen> {
                           ),
                         ),
                         Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 75,
-                                width: 150,
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(100),
-                                  ),
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1,
+                          child: Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 75,
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      53,
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(100),
                                     ),
-                                    left: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                    right: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1.5,
-                                    ),
-                                    top: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ParkingSpot(
-                                "B",
-                                "1",
-                                data.snapshot.child("1/B/isFilled").value
-                                    as bool,
-                                isLeft: false,
-                              ),
-                              ParkingSpot(
-                                "B",
-                                "2",
-                                data.snapshot.child("2/B/isFilled").value
-                                    as bool,
-                                isLeft: false,
-                              ),
-                              Container(
-                                height: 75,
-                                width: 150,
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(100),
-                                  ),
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1,
-                                    ),
-                                    left: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                    right: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1.5,
-                                    ),
-                                    top: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black26,
+                                        width: 1,
+                                      ),
+                                      left: BorderSide(
+                                        color: Colors.black26,
+                                        width: 2,
+                                      ),
+                                      right: BorderSide(
+                                        color: Colors.black26,
+                                        width: 1.5,
+                                      ),
+                                      top: BorderSide(
+                                        color: Colors.black26,
+                                        width: 2,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                                ParkingSpot(
+                                  "B",
+                                  "1",
+                                  data.snapshot.child("1/B/isFilled").value
+                                      as bool,
+                                  isLeft: false,
+                                ),
+                                ParkingSpot(
+                                  "B",
+                                  "2",
+                                  data.snapshot.child("2/B/isFilled").value
+                                      as bool,
+                                  isLeft: false,
+                                ),
+                                Container(
+                                  height: 75,
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      53,
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(100),
+                                    ),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.black26,
+                                        width: 1,
+                                      ),
+                                      left: BorderSide(
+                                        color: Colors.black26,
+                                        width: 2,
+                                      ),
+                                      right: BorderSide(
+                                        color: Colors.black26,
+                                        width: 1.5,
+                                      ),
+                                      top: BorderSide(
+                                        color: Colors.black26,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -420,7 +428,7 @@ class ParkingSpot extends StatelessWidget {
 
     return isFilled
         ? Container(
-            width: 150,
+            width: MediaQuery.of(context).size.width / 2 - 53,
             height: 75,
             decoration: BoxDecoration(
               border: Border(
@@ -454,7 +462,7 @@ class ParkingSpot extends StatelessWidget {
             ),
           )
         : Container(
-            width: 150,
+            width: MediaQuery.of(context).size.width / 2 - 53,
             height: 75,
             decoration: BoxDecoration(
               border: Border(
