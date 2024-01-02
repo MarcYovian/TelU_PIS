@@ -28,7 +28,6 @@ class _ParkingScreenState extends State<ParkingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFEDF7F9),
       appBar: AppBar(
-        // backgroundColor: Colors.amber,
         backgroundColor: const Color(0xFFEDF7F9),
         automaticallyImplyLeading: false,
         bottomOpacity: 1.0,

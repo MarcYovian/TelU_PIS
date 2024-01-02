@@ -50,6 +50,12 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  Image.asset(
+                    "assets/images/logosby.png",
+                    width: 120.0,
+                    height: 120.0,
+                    fit: BoxFit.fill,
+                  ),
                   // Email text field
                   MyTextField(
                     controller: emailController,
