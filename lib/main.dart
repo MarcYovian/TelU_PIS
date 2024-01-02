@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:parking_v3/src/parking_screen.dart';
+import 'package:parking_v3/src/constants/routes.dart';
+import 'package:parking_v3/src/features/auth/application/auth_service.dart';
+import 'package:parking_v3/src/routing/my_routes.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -8,7 +11,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthService(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -16,8 +24,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ParkingScreen(),
+    return const MaterialApp(
+      title: 'TelU PIS',
+      debugShowCheckedModeBanner: false,
+      // home: ParkingScreen(),
+      onGenerateRoute: MyRoutes.generateRoute,
+      initialRoute: authGate,
     );
   }
 }
