@@ -1,16 +1,15 @@
-# parking_v3
+# TelU PIS (Telkom University Parking Information System)
 
-A new Flutter project.
+![TelU PIS](https://github.com/MarcYovian/TelU_PIS/assets/90125356/8b99a3ea-047f-4d4f-826b-dc02d07958c9)
 
-## Getting Started
+## Description
+The mobile application uses Flutter and the Firebase database to provide parking information at Telkom University. The application allows users to see empty and occupied parking spaces, and provides information on the location of the parking space after scanning the QR.
 
-This project is a starting point for a Flutter application.
+## Fitur Utama
+- Tampilan status tempat parkir (kosong/terisi).
+- Fungsi scan QR untuk mendapatkan informasi lokasi parkir.
+- Rekam waktu parkir pengguna.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Technology Used
+- **Flutter** : Mobile application development framework.
+- ""Firebase** : Cloud platform for storing and managing data. 
