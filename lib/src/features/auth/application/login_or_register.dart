@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parking_v3/src/features/auth/presentation/login_screen.dart';
 import 'package:parking_v3/src/features/auth/presentation/register_screen.dart';

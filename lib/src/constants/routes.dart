@@ -4,3 +4,4 @@ const String registerScreen = '/register';
 const String parkingScreen = '/parking';
 const String qrScreen = '/qr';
 const String myProfileScreen = '/myProfile';
+const String myParkingScreen = '/myParking';

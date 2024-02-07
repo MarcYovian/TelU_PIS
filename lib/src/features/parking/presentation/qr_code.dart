@@ -1,12 +1,16 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:parking_v3/src/constants/routes.dart';
+import 'package:parking_v3/src/features/parking/data/parking_repository.dart';
+import 'package:parking_v3/src/features/parking/domain/qr.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QRViewExample extends StatefulWidget {
-  const QRViewExample({Key? key}) : super(key: key);
+  const QRViewExample({super.key});
 
   @override
   State<StatefulWidget> createState() => _QRViewExampleState();
@@ -33,7 +37,18 @@ class _QRViewExampleState extends State<QRViewExample> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Expanded(flex: 4, child: _buildQrView(context)),
+          const Expanded(
+              flex: 1,
+              child: Center(
+                child: Text(
+                  "SCAN QR NOW",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              )),
+          Expanded(flex: 3, child: _buildQrView(context)),
           Expanded(
             flex: 1,
             child: FittedBox(
@@ -41,65 +56,32 @@ class _QRViewExampleState extends State<QRViewExample> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  hasResult(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                            style: const ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
-                                Color(0xFFEDF7F9),
-                              ),
-                            ),
-                            onPressed: () async {
-                              await controller?.toggleFlash();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                return Text(
-                                  'Flash: ${snapshot.data}',
-                                  style: const TextStyle(
-                                    color: Color(0xff0A1D81),
-                                  ),
-                                );
-                              },
-                            )),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFEDF7F9),
-                            ),
-                          ),
-                          onPressed: () async {
-                            await controller?.flipCamera();
-                            setState(() {});
-                          },
-                          child: FutureBuilder(
-                            future: controller?.getCameraInfo(),
-                            builder: (context, snapshot) {
-                              if (snapshot.data != null) {
-                                return Text(
-                                  'Camera facing ${describeEnum(snapshot.data!)}',
-                                  style: const TextStyle(
-                                    color: Color(0xff0A1D81),
-                                  ),
-                                );
-                              } else {
-                                return const Text('loading');
-                              }
-                            },
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFFEDF7F9),
                           ),
                         ),
-                      )
-                    ],
+                        onPressed: () async {
+                          await controller?.toggleFlash();
+                          setState(() {});
+                        },
+                        child: FutureBuilder(
+                          future: controller?.getFlashStatus(),
+                          builder: (context, snapshot) {
+                            return Text(
+                              'Flash: ${snapshot.data}',
+                              style: const TextStyle(
+                                color: Color(0xff0A1D81),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -107,22 +89,10 @@ class _QRViewExampleState extends State<QRViewExample> {
                     children: <Widget>[
                       Container(
                         margin: const EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFEDF7F9),
-                            ),
-                          ),
-                          onPressed: () async {
-                            await controller?.pauseCamera();
-                          },
-                          child: const Text(
-                            'pause',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Color(0xff0A1D81),
-                            ),
-                          ),
+                        child: Center(
+                          child: (result != null)
+                              ? Text("Value : ${result!.code!}")
+                              : const Text("Value :"),
                         ),
                       ),
                       Container(
@@ -134,10 +104,75 @@ class _QRViewExampleState extends State<QRViewExample> {
                             ),
                           ),
                           onPressed: () async {
-                            await controller?.resumeCamera();
+                            var code = result!.code.toString();
+                            if (code.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Scan QR Code"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          "OK",
+                                          style: TextStyle(
+                                            color: Colors.blueGrey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+
+                            if (code == "A1" ||
+                                code == "A2" ||
+                                code == "B1" ||
+                                code == "B2") {
+                              QR qr = QR(
+                                uid: FirebaseAuth.instance.currentUser!.uid,
+                                value: result!.code!,
+                                inAt: Timestamp.now(),
+                                outAt: null,
+                              );
+
+                              if (await controller!.getFlashStatus() == true) {
+                                controller!.toggleFlash();
+                              }
+
+                              ParkingRepository().sendQrData(qr);
+                              // ignore: use_build_context_synchronously
+                              Navigator.pushNamed(context, parkingScreen);
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text("Code not match"),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          "OK",
+                                          style: TextStyle(
+                                            color: Colors.blueGrey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           child: const Text(
-                            'resume',
+                            'Save',
                             style: TextStyle(
                               fontSize: 20,
                               color: Color(0xff0A1D81),
@@ -207,12 +242,29 @@ class _QRViewExampleState extends State<QRViewExample> {
   }
 
   Widget hasResult() {
+    // print(result!.code! ?? null);
+
     if (result == null) {
       return const Text('Scan a code');
     }
 
-    return Text(
-      'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}',
-    );
+    if (result!.code == "A1" ||
+        result!.code == "A2" ||
+        result!.code == "B1" ||
+        result!.code == "B2") {
+      QR qr = QR(
+        uid: FirebaseAuth.instance.currentUser!.uid,
+        value: result!.code!,
+        inAt: Timestamp.now(),
+        outAt: null,
+      );
+
+      ParkingRepository().sendQrData(qr);
+      Navigator.pushNamed(context, parkingScreen);
+
+      return Text("${result!.code}");
+    }
+
+    return const Text("Code not found");
   }
 }

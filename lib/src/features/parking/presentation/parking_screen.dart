@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import 'package:flutter/services.dart';
+import 'package:parking_v3/src/constants/my_icon.dart';
 import 'package:parking_v3/src/constants/routes.dart';
 import 'package:parking_v3/src/features/auth/application/auth_service.dart';
 import 'package:parking_v3/src/features/parking/data/parking_repository.dart';
 import 'package:parking_v3/src/features/parking/presentation/qr_code.dart';
+import 'package:parking_v3/src/features/parking/presentation/widget/parking_zone.dart';
 import 'package:parking_v3/src/features/profile/domain/profile.dart';
 import 'package:provider/provider.dart';
 
@@ -18,473 +19,300 @@ class ParkingScreen extends StatefulWidget {
 
 class _ParkingScreenState extends State<ParkingScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseDatabase _database = FirebaseDatabase.instance;
   final ParkingRepository _parkingRepository = ParkingRepository();
+  Profile? profile;
 
-  @override
-  Widget build(BuildContext context) {
-    var availableSpots = 0;
-    return Scaffold(
-      backgroundColor: const Color(0xFFEDF7F9),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFEDF7F9),
-        automaticallyImplyLeading: false,
-        bottomOpacity: 1.0,
-        foregroundColor: Colors.white10,
-        leading: _auth.currentUser != null
-            ? Padding(
-                padding: const EdgeInsets.all(10),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, myProfileScreen);
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(60),
-                    child: StreamBuilder(
-                      stream: _parkingRepository.getUserData(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(
-                            child: Text("error : ${snapshot.error}"),
-                          );
-                        }
-
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        Profile profile = Profile.fromMap(
-                          snapshot.data!.data() as Map<String, dynamic>,
-                        );
-                        return Image.network(
-                          profile.image,
-                          width: 30,
-                          height: 30,
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              )
-            : Container(),
-        title: const Center(
-          child: Text(
-            "PARKING ZONE",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xff0A1D81),
+  void showBackDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Want to leave"),
+          content: const Text("Are you sure you want to leave this Apps? "),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
             ),
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const QRViewExample(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.qr_code,
-              color: Color(0xff0A1D81),
+            TextButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              child: const Text("Sure"),
             ),
-          ),
-          IconButton(
-            onPressed: () async {
-              final authService =
-                  Provider.of<AuthService>(context, listen: false);
-              await authService.signOut();
-              // ignore: use_build_context_synchronously
-              Navigator.pushNamed(context, authGate);
-            },
-            icon: const Icon(
-              Icons.logout_rounded,
-              color: Color(0xff0A1D81),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          StreamBuilder(
-            stream: _database.ref('smart_parking/blocks').onValue,
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text("Error : ${snapshot.error}"),
-                );
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (snapshot.hasData) {
-                // var data = snapshot.data!.snapshot;
-                return const Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 30, top: 40),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      children: [
-                        const Text(
-                          "Your Parking Spot :",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        const Gap(10),
-                        Text(
-                          "A-1",
-                          style: TextStyle(
-                            color: Color(0xff0A1D81),
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              return Container();
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 30),
-            child: Center(
-              child: StreamBuilder(
-                stream: _parkingRepository.getDataParking(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return const Center(
-                      child: Text("Error"),
-                    );
-                  }
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-
-                  final data = snapshot.data!;
-                  availableSpots =
-                      (data.snapshot.child('1/A/isFilled').value as bool
-                              ? 0
-                              : 1) +
-                          (data.snapshot.child('1/B/isFilled').value as bool
-                              ? 0
-                              : 1) +
-                          (data.snapshot.child('2/A/isFilled').value as bool
-                              ? 0
-                              : 1) +
-                          (data.snapshot.child('2/B/isFilled').value as bool
-                              ? 0
-                              : 1);
-                  return Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 75,
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 53,
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(100),
-                                  ),
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1,
-                                    ),
-                                    left: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                    right: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1.5,
-                                    ),
-                                    top: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ParkingSpot(
-                                "A",
-                                "1",
-                                data.snapshot.child("1/A/isFilled").value
-                                    as bool,
-                                isLeft: true,
-                              ),
-                              ParkingSpot(
-                                "A",
-                                "2",
-                                data.snapshot.child("2/A/isFilled").value
-                                    as bool,
-                                isLeft: true,
-                              ),
-                              Container(
-                                height: 75,
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 53,
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    bottomRight: Radius.circular(100),
-                                  ),
-                                  border: Border(
-                                    bottom: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1,
-                                    ),
-                                    left: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                    right: BorderSide(
-                                      color: Colors.black26,
-                                      width: 1.5,
-                                    ),
-                                    top: BorderSide(
-                                      color: Colors.black26,
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        RotatedBox(
-                          quarterTurns: -1,
-                          child: Text(
-                            "${availableSpots.toString()} SLOT FREE",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black26,
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(right: 10),
-                            child: Column(
-                              children: [
-                                Container(
-                                  height: 75,
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      53,
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(100),
-                                    ),
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.black26,
-                                        width: 1,
-                                      ),
-                                      left: BorderSide(
-                                        color: Colors.black26,
-                                        width: 2,
-                                      ),
-                                      right: BorderSide(
-                                        color: Colors.black26,
-                                        width: 1.5,
-                                      ),
-                                      top: BorderSide(
-                                        color: Colors.black26,
-                                        width: 2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                ParkingSpot(
-                                  "B",
-                                  "1",
-                                  data.snapshot.child("1/B/isFilled").value
-                                      as bool,
-                                  isLeft: false,
-                                ),
-                                ParkingSpot(
-                                  "B",
-                                  "2",
-                                  data.snapshot.child("2/B/isFilled").value
-                                      as bool,
-                                  isLeft: false,
-                                ),
-                                Container(
-                                  height: 75,
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      53,
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(100),
-                                    ),
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.black26,
-                                        width: 1,
-                                      ),
-                                      left: BorderSide(
-                                        color: Colors.black26,
-                                        width: 2,
-                                      ),
-                                      right: BorderSide(
-                                        color: Colors.black26,
-                                        width: 1.5,
-                                      ),
-                                      top: BorderSide(
-                                        color: Colors.black26,
-                                        width: 2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          const Expanded(
-            // flex: 1,
-            child: Center(
-              child: Column(
-                children: [
-                  RotatedBox(
-                    quarterTurns: 1,
-                    child: Image(
-                      image: AssetImage("assets/images/car.png"),
-                      opacity: AlwaysStoppedAnimation(0.3),
-                      alignment: Alignment.center,
-                      height: 45,
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_upward,
-                    color: Colors.black26,
-                  ),
-                  Text(
-                    "ENTRY",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black26,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
-}
-
-class ParkingSpot extends StatelessWidget {
-  final String block;
-  final String spot;
-  final bool data;
-  final bool isLeft;
-
-  const ParkingSpot(
-    this.block,
-    this.spot,
-    this.data, {
-    super.key,
-    required this.isLeft,
-  });
 
   @override
   Widget build(BuildContext context) {
-    bool isFilled = data;
-    bool isBlockA = (block == "A");
+    var uid = _auth.currentUser!.uid;
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          return;
+        }
+        showBackDialog();
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFEDF7F9),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFFEDF7F9),
+          automaticallyImplyLeading: false,
+          bottomOpacity: 1.0,
+          foregroundColor: Colors.white10,
+          leading: _auth.currentUser != null
+              ? Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, myProfileScreen);
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(60),
+                      child: StreamBuilder(
+                        stream: _parkingRepository.getUserData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text("error : ${snapshot.error}"),
+                            );
+                          }
 
-    return isFilled
-        ? Container(
-            width: MediaQuery.of(context).size.width / 2 - 53,
-            height: 75,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: const BorderSide(color: Colors.black26, width: 0),
-                left: isBlockA
-                    ? const BorderSide(color: Colors.black26, width: 2)
-                    : BorderSide.none,
-                right: isBlockA
-                    ? BorderSide.none
-                    : const BorderSide(color: Colors.black26, width: 2),
-                top: const BorderSide(color: Colors.black26, width: 1.5),
-              ),
-            ),
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            padding: const EdgeInsets.all(10),
-            child: Center(
-              child: isLeft
-                  ? const RotatedBox(
-                      quarterTurns: -2,
-                      child: Image(
-                        image: AssetImage("assets/images/car.png"),
-                        alignment: Alignment.center,
-                        height: 45,
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          profile = Profile.fromMap(
+                            snapshot.data!.data() as Map<String, dynamic>,
+                          );
+                          return Image.network(
+                            profile!.image,
+                            width: 30,
+                            height: 30,
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
-                    )
-                  : const Image(
-                      image: AssetImage("assets/images/car.png"),
-                      alignment: Alignment.center,
-                      height: 45,
                     ),
-            ),
-          )
-        : Container(
-            width: MediaQuery.of(context).size.width / 2 - 53,
-            height: 75,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: const BorderSide(color: Colors.black26, width: 0),
-                left: isBlockA
-                    ? const BorderSide(color: Colors.black26, width: 2)
-                    : BorderSide.none,
-                right: isBlockA
-                    ? BorderSide.none
-                    : const BorderSide(color: Colors.black26, width: 2),
-                top: const BorderSide(color: Colors.black26, width: 0),
+                  ),
+                )
+              : Container(),
+          title: const Center(
+            child: Text(
+              "PARKING ZONE",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff0A1D81),
               ),
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            padding: const EdgeInsets.all(10),
-            child: Center(
-              child: Text(
-                '$block - $spot',
-                style: const TextStyle(
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, myParkingScreen, arguments: {
+                  'myProfile': profile,
+                });
+              },
+              icon: const Icon(
+                MyIcons.directions_car_rounded,
+                color: Color(0xff0A1D81),
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QRViewExample(),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.qr_code,
+                color: Color(0xff0A1D81),
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Confirm Logout"),
+                      content: const Text("Are you sure you want to log out?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            final authService = Provider.of<AuthService>(
+                              context,
+                              listen: false,
+                            );
+                            await authService.signOut();
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushNamed(context, authGate);
+                          },
+                          child: const Text("OK"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(
+                Icons.logout_rounded,
+                color: Color(0xff0A1D81),
+              ),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          top: true,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth <= 380) {
+                return ParkingZone(
+                  parkingRepository: _parkingRepository,
+                  uid: uid,
+                  heightSpot: 55,
+                  heightImage: 35,
+                  spotPL: 10,
+                  spotPT: 10,
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0A1D81),
-                ),
-              ),
-            ),
-          );
+                  fontWeight: FontWeight.w400,
+                  currentSpotFontSize: 18,
+                  currentSpotFontWeight: FontWeight.bold,
+                  spotFontSize: 16,
+                  spotFontWeight: FontWeight.w600,
+                  slotFontSize: 16,
+                  slotFontWeight: FontWeight.w600,
+                  centerAreaFlex: 1,
+                  leftAreaFlex: 2,
+                  rightAreaFlex: 2,
+                  entryFontSize: 16,
+                  entryFontWeight: FontWeight.w500,
+                  entryHeightImage: 35,
+                  entryIconSize: 20,
+                );
+              } else if (constraints.maxWidth > 380 &&
+                  constraints.maxWidth <= 530) {
+                return ParkingZone(
+                  parkingRepository: _parkingRepository,
+                  uid: uid,
+                  heightSpot: 75,
+                  heightImage: 45,
+                  spotPL: 10,
+                  spotPT: 10,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  currentSpotFontSize: 20,
+                  currentSpotFontWeight: FontWeight.bold,
+                  spotFontSize: 18,
+                  spotFontWeight: FontWeight.bold,
+                  slotFontSize: 18,
+                  slotFontWeight: FontWeight.bold,
+                  centerAreaFlex: 1,
+                  leftAreaFlex: 2,
+                  rightAreaFlex: 2,
+                  entryFontSize: 16,
+                  entryFontWeight: FontWeight.w500,
+                  entryHeightImage: 45,
+                  entryIconSize: 20,
+                );
+              } else if (constraints.maxWidth > 530 &&
+                  constraints.maxWidth <= 678) {
+                return ParkingZone(
+                  parkingRepository: _parkingRepository,
+                  uid: uid,
+                  heightSpot: 100,
+                  heightImage: 60,
+                  spotPL: 20,
+                  spotPT: 15,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  currentSpotFontSize: 24,
+                  currentSpotFontWeight: FontWeight.bold,
+                  spotFontSize: 22,
+                  spotFontWeight: FontWeight.bold,
+                  slotFontSize: 22,
+                  slotFontWeight: FontWeight.bold,
+                  leftAreaFlex: 3,
+                  centerAreaFlex: 2,
+                  rightAreaFlex: 3,
+                  entryFontSize: 22,
+                  entryFontWeight: FontWeight.w500,
+                  entryHeightImage: 80,
+                  entryIconSize: 30,
+                );
+              } else if (constraints.maxWidth > 678 &&
+                  constraints.maxWidth <= 920) {
+                return ParkingZone(
+                  parkingRepository: _parkingRepository,
+                  uid: uid,
+                  heightSpot: 120,
+                  heightImage: 60,
+                  spotPL: 20,
+                  spotPT: 15,
+                  fontSize: 26,
+                  fontWeight: FontWeight.w400,
+                  currentSpotFontSize: 30,
+                  currentSpotFontWeight: FontWeight.bold,
+                  spotFontSize: 28,
+                  spotFontWeight: FontWeight.bold,
+                  slotFontSize: 26,
+                  slotFontWeight: FontWeight.bold,
+                  leftAreaFlex: 4,
+                  centerAreaFlex: 3,
+                  rightAreaFlex: 4,
+                  entryFontSize: 26,
+                  entryFontWeight: FontWeight.w500,
+                  entryHeightImage: 85,
+                  entryIconSize: 45,
+                );
+              } else {
+                return ParkingZone(
+                  parkingRepository: _parkingRepository,
+                  uid: uid,
+                  heightSpot: 140,
+                  heightImage: 100,
+                  spotPL: 20,
+                  spotPT: 15,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w500,
+                  currentSpotFontSize: 32,
+                  currentSpotFontWeight: FontWeight.bold,
+                  spotFontSize: 30,
+                  spotFontWeight: FontWeight.bold,
+                  slotFontSize: 28,
+                  slotFontWeight: FontWeight.bold,
+                  leftAreaFlex: 4,
+                  centerAreaFlex: 3,
+                  rightAreaFlex: 4,
+                  entryFontSize: 28,
+                  entryFontWeight: FontWeight.bold,
+                  entryHeightImage: 80,
+                  entryIconSize: 45,
+                );
+              }
+            },
+          ),
+        ),
+      ),
+    );
   }
 }

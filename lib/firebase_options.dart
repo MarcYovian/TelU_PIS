@@ -49,7 +49,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '680719267065',
     projectId: 'parkingiot-6568d',
     authDomain: 'parkingiot-6568d.firebaseapp.com',
-    databaseURL: 'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkingiot-6568d.appspot.com',
   );
 
@@ -58,7 +59,8 @@ class DefaultFirebaseOptions {
     appId: '1:680719267065:android:37b8b89519fe3aabfdde28',
     messagingSenderId: '680719267065',
     projectId: 'parkingiot-6568d',
-    databaseURL: 'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkingiot-6568d.appspot.com',
   );
 
@@ -67,7 +69,8 @@ class DefaultFirebaseOptions {
     appId: '1:680719267065:ios:3e6e9e7c44c793dafdde28',
     messagingSenderId: '680719267065',
     projectId: 'parkingiot-6568d',
-    databaseURL: 'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkingiot-6568d.appspot.com',
     iosBundleId: 'com.example.parkingV3',
   );
@@ -77,7 +80,8 @@ class DefaultFirebaseOptions {
     appId: '1:680719267065:ios:576f7c19bc7e4b05fdde28',
     messagingSenderId: '680719267065',
     projectId: 'parkingiot-6568d',
-    databaseURL: 'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
+    databaseURL:
+        'https://parkingiot-6568d-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'parkingiot-6568d.appspot.com',
     iosBundleId: 'com.example.parkingV3.RunnerTests',
   );

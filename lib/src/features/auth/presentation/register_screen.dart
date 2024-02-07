@@ -178,6 +178,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const Gap(50),
+
                   // profile image
                   InkWell(
                     borderRadius: BorderRadius.circular(60),
@@ -230,7 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                     ),
                   ),
-                  const Gap(50),
+                  const Gap(30),
 
                   // name text field
                   MyTextField(
@@ -294,7 +296,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     onTap: signUp,
                     text: "sign Up",
                   ),
-                  const Gap(50),
+                  const Gap(20),
 
                   // Already a member ? register now
                   Row(
@@ -313,6 +315,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
+                  const Gap(40),
                 ],
               ),
             ),
