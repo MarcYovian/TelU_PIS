@@ -6,9 +6,9 @@
 The mobile application uses Flutter and the Firebase database to provide parking information at Telkom University. The application allows users to see empty and occupied parking spaces, and provides information on the location of the parking space after scanning the QR.
 
 ## Fitur Utama
-- Tampilan status tempat parkir (kosong/terisi).
-- Fungsi scan QR untuk mendapatkan informasi lokasi parkir.
-- Rekam waktu parkir pengguna.
+- Display of parking lot status (empty/occupied).
+- QR scan function to get parking location information.
+- Record user parking time.
 
 ## Technology Used
 - **Flutter** : Mobile application development framework.
