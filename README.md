@@ -12,4 +12,4 @@ The mobile application uses Flutter and the Firebase database to provide parking
 
 ## Technology Used
 - **Flutter** : Mobile application development framework.
-- ""Firebase** : Cloud platform for storing and managing data. 
+- **Firebase** : Cloud platform for storing and managing data. 
