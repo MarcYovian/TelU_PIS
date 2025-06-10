@@ -40,7 +40,7 @@ class _MyParkingScreenState extends State<MyParkingScreen> {
 
   void addTime() {
     if (isParking) {
-      final addSeconds = 1;
+      const addSeconds = 1;
 
       setState(() {
         final seconds = duration.inSeconds + addSeconds;
@@ -51,7 +51,7 @@ class _MyParkingScreenState extends State<MyParkingScreen> {
   }
 
   void startTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+    timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
   }
 
   void initTime() async {
@@ -88,16 +88,6 @@ class _MyParkingScreenState extends State<MyParkingScreen> {
         automaticallyImplyLeading: false,
         bottomOpacity: 1.0,
         foregroundColor: Colors.white10,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.chevron_left_rounded,
-            color: Color(0xff0A1D81),
-            size: 30,
-          ),
-        ),
         title: const Center(
           child: Text(
             "My Parking",
